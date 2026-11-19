@@ -1,0 +1,379 @@
+<title>Turni sul calendario</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: colonna unica stretta, tre passi in sequenza (PDF, nome, calendario); un riquadro per passo */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --ink:#17212b; --muted:#5b6772; --line:#d5dce3; --soft:#f3f5f7;
+  --accent:#0e5c86; --accent-ink:#ffffff;
+  --day:#e3eef6; --day-ink:#0e4a6c; --night:#e4e6f7; --night-ink:#35358f; --pa:#fbe9c8; --pa-ink:#8a4b00;
+  --bad:#b3261e; --badbg:#fbe9e7; --ok:#1d7a4b; --okbg:#e3f3ea;
+  --f-ui:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f151b; --surface:#18212a; --ink:#e6ecf1; --muted:#92a0ac; --line:#2a3641; --soft:#1e2933;
+    --accent:#63b1df; --accent-ink:#0c1620;
+    --day:#1b3040; --day-ink:#9fd0ee; --night:#26284d; --night-ink:#b9bcff; --pa:#4a3714; --pa-ink:#f4c883;
+    --bad:#ff8f86; --badbg:#3b2220; --ok:#5fcf93; --okbg:#173326; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f151b; --surface:#18212a; --ink:#e6ecf1; --muted:#92a0ac; --line:#2a3641; --soft:#1e2933;
+  --accent:#63b1df; --accent-ink:#0c1620;
+  --day:#1b3040; --day-ink:#9fd0ee; --night:#26284d; --night-ink:#b9bcff; --pa:#4a3714; --pa-ink:#f4c883;
+  --bad:#ff8f86; --badbg:#3b2220; --ok:#5fcf93; --okbg:#173326; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--f-ui);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1,h2,p{margin:0}
+h1{font:600 22px/1.2 var(--f-ui);letter-spacing:-.01em;text-wrap:balance}
+.lead{color:var(--muted);font-size:14px;max-width:60ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card h2{font:600 15px var(--f-ui)}
+.step{font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:96px;padding:14px;border:1.5px dashed var(--line);border-radius:8px;background:var(--soft);cursor:pointer;text-align:center}
+.drop.over{border-color:var(--accent);background:var(--day)}
+.drop b{font-weight:600}
+.drop span{color:var(--muted);font-size:13px}
+.drop input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.drop:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.note{border-radius:8px;padding:9px 11px;font-size:13px}
+.note.bad{background:var(--badbg);color:var(--bad)}
+.note.ok{background:var(--okbg);color:var(--ok)}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--muted)}
+select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;min-height:44px;padding:0 10px;width:100%}
+select:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat{background:var(--soft);border-radius:8px;padding:10px}
+.stat b{display:block;font:500 22px var(--f-mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stat span{font-size:12px;color:var(--muted)}
+.list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.list div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.list div:last-child{border-bottom:0}
+.list .d{font:500 14px var(--f-mono)}
+.list .d i{font-style:normal;color:var(--muted);font-family:var(--f-ui);font-size:13px;margin-left:6px}
+.chip{font:500 12px var(--f-ui);padding:3px 9px;border-radius:12px;white-space:nowrap}
+.chip.day{background:var(--day);color:var(--day-ink)}
+.chip.night{background:var(--night);color:var(--night-ink)}
+.chip.pa{background:var(--pa);color:var(--pa-ink)}
+.opt{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+.opt input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--accent);flex:none}
+.opt small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font:500 15px var(--f-ui);cursor:pointer;flex:1 1 180px}
+.btn.alt{background:var(--surface);color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+details{font-size:13.5px;color:var(--muted)}
+details summary{cursor:pointer;color:var(--ink);font-weight:500;min-height:32px;display:flex;align-items:center}
+details ol{margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:5px}
+.legend{display:flex;gap:6px;flex-wrap:wrap}
+.foot{font-size:12px;color:var(--muted)}
+.empty-prev{color:var(--muted);font-size:13px}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:no-preference){.drop,.btn{transition:background .12s,border-color .12s}}
+</style>
+
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:6px">
+    <h1>Turni sul calendario</h1>
+    <p class="lead">Carica il PDF dei turni del mese, scegli il tuo nome e scarica un file da aprire con il calendario del telefono o di Google. Ogni turno compare come impegno:</p>
+    <div class="legend" aria-label="Tipi di impegno"><span class="chip day">Giornata 8-20</span><span class="chip night">Notte 20-8</span><span class="chip pa">Giornata PA</span></div>
+  </header>
+
+  <section class="card" aria-labelledby="s1">
+    <div class="step">Passo 1</div>
+    <h2 id="s1">PDF dei turni</h2>
+    <label class="drop" id="drop" for="pdf">
+      <b id="dropT">Scegli il PDF</b>
+      <span id="dropS">oppure trascinalo qui</span>
+      <input type="file" id="pdf" accept="application/pdf,.pdf">
+    </label>
+    <div id="err" class="note bad" role="alert" hidden></div>
+  </section>
+
+  <section class="card" id="c2" aria-labelledby="s2" hidden>
+    <div class="step">Passo 2</div>
+    <h2 id="s2">Chi sei</h2>
+    <label class="f" for="who">Il tuo nome, come compare nel PDF
+      <select id="who"></select>
+    </label>
+  </section>
+
+  <section class="card" id="c3" aria-labelledby="s3" hidden>
+    <div class="step">Passo 3</div>
+    <h2 id="s3">Il tuo mese</h2>
+    <div class="stats">
+      <div class="stat"><b id="nDay">0</b><span>giornate</span></div>
+      <div class="stat"><b id="nNight">0</b><span>notti</span></div>
+      <div class="stat"><b id="nPa">0</b><span>PA</span></div>
+    </div>
+    <div class="list" id="list" role="list"></div>
+    <p class="empty-prev" id="none" hidden>Questo nome non ha turni nel mese. Controlla di aver scelto quello giusto.</p>
+    <label class="opt" id="optPa">
+      <input type="checkbox" id="splitPa" checked>
+      <span>Metti le PA in un file a parte
+        <small>Importandolo in un calendario separato (per esempio “Turni PA”) lo colori come vuoi e le PA si distinguono a colpo d'occhio.</small></span>
+    </label>
+    <div class="row">
+      <button class="btn" id="dl1" type="button">Scarica i turni</button>
+      <button class="btn alt" id="dl2" type="button" hidden>Scarica le PA</button>
+    </div>
+    <div id="done" class="note ok" role="status" hidden></div>
+    <details>
+      <summary>Come aprire il file</summary>
+      <ol>
+        <li><b>Telefono:</b> apri il file scaricato (o condiviso) e scegli il calendario in cui inserire i turni.</li>
+        <li><b>Google Calendar da computer:</b> calendar.google.com, ingranaggio, Impostazioni, Importa ed esporta, Importa; scegli il file e il calendario di destinazione.</li>
+        <li>Se riscarichi lo stesso mese dopo una modifica, i turni già presenti vengono aggiornati e non duplicati.</li>
+      </ol>
+    </details>
+  </section>
+
+  <p class="foot">Il PDF viene letto sul tuo dispositivo e non viene inviato a nessuno.</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+/* ===== Nucleo: lettura della griglia turni e file calendario ===== */
+const TURNI = (function () {
+  'use strict';
+  const MESI = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+  const GIORNI = ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'];
+  const GIORNI_BREVI = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'];
+
+  const norm = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+  const median = a => { const b = a.slice().sort((x, y) => x - y); return b.length ? b[Math.floor(b.length / 2)] : 0; };
+
+  /* items: [{str, x, y, w}] di una pagina (y cresce verso l'alto, come in pdf.js) */
+  function parsePage(items) {
+    const it = items.map(i => ({ s: String(i.str).replace(/\s+/g, ' ').trim(), x: i.x, y: i.y, w: i.w || 0 })).filter(i => i.s);
+    it.forEach(i => { i.cx = i.x + i.w / 2; });
+
+    let month = null, year = null;
+    const mre = new RegExp('^(' + MESI.join('|') + ')\\s+(\\d{4})$', 'i');
+    it.forEach(i => { const m = mre.exec(i.s); if (m) { month = MESI.indexOf(m[1].toLowerCase()); year = +m[2]; i.kind = 'title'; } });
+
+    const lre = /^(lun|mar|mer|gio|ven|sab|dom)\s+(\d{1,2})\s*\/\s*(\d{1,2})$/i;
+    const labels = [];
+    it.forEach(i => { const m = lre.exec(i.s); if (m) { i.kind = 'label'; labels.push({ y: i.y, day: +m[2], month: +m[3] - 1 }); } });
+    if (!labels.length) throw new Error('Non trovo le righe dei giorni (come "lun 2/11"). Questo non sembra il PDF dei turni del Pronto Soccorso.');
+
+    const hdr = {};
+    it.forEach(i => {
+      const n = norm(i.s);
+      if (n === 'mecau 1') hdr.m1 = i; else if (n === 'mecau 2') hdr.m2 = i;
+      else if (n.startsWith('notte')) hdr.night = i; else if (n.startsWith('bassa intensita')) hdr.bi = i;
+    });
+    const keys = ['m1', 'm2', 'night', 'bi'];
+    if (keys.some(k => !hdr[k])) throw new Error('Non trovo le intestazioni delle colonne (Mecau 1, Mecau 2, Notte, Bassa intensità).');
+    Object.values(hdr).forEach(h => { h.kind = 'hdr'; });
+    const centers = keys.map(k => ({ k, cx: hdr[k].cx }));
+
+    const ys = labels.map(l => l.y).sort((a, b) => b - a);
+    const gaps = []; for (let i = 1; i < ys.length; i++) gaps.push(ys[i - 1] - ys[i]);
+    const tol = (median(gaps) || 10) / 2;
+
+    const entries = [];
+    const seen = new Set();
+    it.forEach(i => {
+      if (i.kind) return;
+      let best = null;
+      labels.forEach(l => { const d = Math.abs(l.y - i.y); if (d <= tol && (!best || d < best.d)) best = { l, d }; });
+      if (!best) return;
+      let g = null;
+      centers.forEach(c => { const d = Math.abs(c.cx - i.cx); if (!g || d < g.d) g = { k: c.k, d }; });
+      const pa = /\bPA\b/i.test(i.s);
+      const name = i.s.replace(/\bPA\b/gi, '').replace(/\s+/g, ' ').trim();
+      if (!name) return;
+      const key = best.l.day + '|' + best.l.month + '|' + g.k + '|' + norm(name);
+      if (seen.has(key)) return;   // lo stesso nome compare in due mezze colonne
+      seen.add(key);
+      entries.push({ day: best.l.day, month: best.l.month, col: g.k, type: g.k === 'night' ? 'night' : 'day', name, pa });
+    });
+
+    if (month === null) month = labels[0].month;
+    return { month, year, entries, days: labels.length };
+  }
+
+  function parse(pages) {
+    const out = { month: null, year: null, entries: [], days: 0 };
+    pages.forEach(p => {
+      const r = parsePage(p);
+      if (out.month === null) { out.month = r.month; out.year = r.year; }
+      out.entries = out.entries.concat(r.entries); out.days += r.days;
+    });
+    if (out.year === null) out.year = new Date().getFullYear();
+    const byKey = new Map();
+    out.entries.forEach(e => { const k = norm(e.name); if (!byKey.has(k)) byKey.set(k, e.name); });
+    out.names = Array.from(byKey.values()).sort((a, b) => a.localeCompare(b, 'it'));
+    return out;
+  }
+
+  /* turni di una persona, uno per giorno e fascia, in ordine di data */
+  function shiftsOf(parsed, name) {
+    const k = norm(name), map = new Map();
+    parsed.entries.forEach(e => {
+      if (norm(e.name) !== k) return;
+      const key = e.day + '-' + e.type;
+      const prev = map.get(key);
+      if (!prev || (e.pa && !prev.pa)) map.set(key, { y: parsed.year, m: e.month, d: e.day, type: e.type, pa: e.pa });
+    });
+    return Array.from(map.values()).sort((a, b) => (a.m - b.m) || (a.d - b.d) || (a.type === 'day' ? -1 : 1));
+  }
+
+  const p2 = n => String(n).padStart(2, '0');
+  const dstr = (y, m, d) => y + p2(m + 1) + p2(d);
+  function title(s) { return s.type === 'night' ? (s.pa ? 'Notte PA' : 'Notte 20-8') : (s.pa ? 'Giornata PA' : 'Giornata 8-20'); }
+
+  const TZ = ['BEGIN:VTIMEZONE', 'TZID:Europe/Rome', 'BEGIN:DAYLIGHT', 'TZOFFSETFROM:+0100', 'TZOFFSETTO:+0200', 'TZNAME:CEST', 'DTSTART:19700329T020000', 'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU', 'END:DAYLIGHT', 'BEGIN:STANDARD', 'TZOFFSETFROM:+0200', 'TZOFFSETTO:+0100', 'TZNAME:CET', 'DTSTART:19701025T030000', 'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU', 'END:STANDARD', 'END:VTIMEZONE'];
+
+  function buildIcs(shifts, who, calName, now) {
+    const t = now || new Date();
+    const stamp = t.getUTCFullYear() + p2(t.getUTCMonth() + 1) + p2(t.getUTCDate()) + 'T' + p2(t.getUTCHours()) + p2(t.getUTCMinutes()) + p2(t.getUTCSeconds()) + 'Z';
+    const slug = norm(who).replace(/[^a-z0-9]+/g, '-');
+    const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Turni PS Susa//IT', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:' + calName, 'X-WR-TIMEZONE:Europe/Rome'].concat(TZ);
+    shifts.forEach(s => {
+      const start = dstr(s.y, s.m, s.d) + (s.type === 'night' ? 'T200000' : 'T080000');
+      const nd = new Date(s.y, s.m, s.d + (s.type === 'night' ? 1 : 0));
+      const end = dstr(nd.getFullYear(), nd.getMonth(), nd.getDate()) + (s.type === 'night' ? 'T080000' : 'T200000');
+      L.push('BEGIN:VEVENT',
+        'UID:' + dstr(s.y, s.m, s.d) + '-' + s.type + '-' + slug + '@turni-ps-susa',
+        'DTSTAMP:' + stamp,
+        'DTSTART;TZID=Europe/Rome:' + start,
+        'DTEND;TZID=Europe/Rome:' + end,
+        'SUMMARY:' + title(s),
+        'LOCATION:Pronto Soccorso Susa',
+        'TRANSP:OPAQUE',
+        'END:VEVENT');
+    });
+    L.push('END:VCALENDAR');
+    return L.join('\r\n') + '\r\n';
+  }
+
+  return { MESI, GIORNI, GIORNI_BREVI, norm, parse, parsePage, shiftsOf, buildIcs, title };
+})();
+if (typeof module !== 'undefined') module.exports = TURNI;
+
+</script>
+<script>
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const T = TURNI;
+  let parsed = null, shifts = [];
+
+  function showErr(t) { const e = $('err'); e.textContent = t || ''; e.hidden = !t; }
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
+
+  async function readPdf(file) {
+    if (!window.pdfjsLib) throw new Error('Non riesco a caricare lo strumento di lettura del PDF. Controlla la connessione e riprova.');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const data = new Uint8Array(await file.arrayBuffer());
+    const pdf = await pdfjsLib.getDocument({ data }).promise;
+    const pages = [];
+    for (let p = 1; p <= pdf.numPages; p++) {
+      const page = await pdf.getPage(p);
+      const tc = await page.getTextContent({ disableCombineTextItems: true });
+      pages.push(tc.items.filter(i => i.str != null).map(i => ({ str: i.str, x: i.transform[4], y: i.transform[5], w: i.width })));
+    }
+    return T.parse(pages);
+  }
+
+  async function onFile(file) {
+    showErr(''); $('c2').hidden = true; $('c3').hidden = true; $('done').hidden = true;
+    if (!file) return;
+    $('dropT').textContent = file.name; $('dropS').textContent = 'lettura in corso…';
+    try {
+      parsed = await readPdf(file);
+      if (!parsed.entries.length) throw new Error('Il PDF non contiene nomi nelle caselle dei turni.');
+      $('dropS').textContent = T.MESI[parsed.month] + ' ' + parsed.year + ' · ' + parsed.names.length + ' nomi trovati';
+      const sel = $('who'); sel.textContent = '';
+      parsed.names.forEach(n => { const o = document.createElement('option'); o.value = n; o.textContent = n; sel.appendChild(o); });
+      const last = lsGet('turni-nome');
+      const m = parsed.names.find(n => T.norm(n) === T.norm(last || ''));
+      if (m) sel.value = m; else if (!last) sel.selectedIndex = 0;
+      $('c2').hidden = false; render();
+    } catch (e) {
+      parsed = null; $('dropT').textContent = 'Scegli il PDF'; $('dropS').textContent = 'oppure trascinalo qui';
+      showErr(e && e.message ? e.message : 'Non riesco a leggere questo PDF.');
+    }
+  }
+
+  function chipFor(s) { return s.type === 'night' ? ['night', 'Notte 20-8'] : (s.pa ? ['pa', 'Giornata PA'] : ['day', 'Giornata 8-20']); }
+
+  function render() {
+    if (!parsed) return;
+    const who = $('who').value; lsSet('turni-nome', who);
+    shifts = T.shiftsOf(parsed, who);
+    $('done').hidden = true;
+    const nd = shifts.filter(s => s.type === 'day' && !s.pa).length, nn = shifts.filter(s => s.type === 'night').length, np = shifts.filter(s => s.pa).length;
+    $('nDay').textContent = nd; $('nNight').textContent = nn; $('nPa').textContent = np;
+    const list = $('list'); list.textContent = '';
+    shifts.forEach(s => {
+      const [cls, lbl] = chipFor(s);
+      const row = document.createElement('div'); row.setAttribute('role', 'listitem');
+      const d = document.createElement('span'); d.className = 'd';
+      const wd = T.GIORNI_BREVI[new Date(s.y, s.m, s.d).getDay()];
+      d.textContent = s.d + ' ' + T.MESI[s.m].slice(0, 3);
+      const i = document.createElement('i'); i.textContent = wd; d.appendChild(i);
+      const c = document.createElement('span'); c.className = 'chip ' + cls; c.textContent = lbl;
+      row.appendChild(d); row.appendChild(c); list.appendChild(row);
+    });
+    $('none').hidden = shifts.length > 0; list.hidden = shifts.length === 0;
+    $('optPa').hidden = np === 0;
+    const split = np > 0 && $('splitPa').checked;
+    $('dl1').textContent = split ? 'Scarica i turni (senza PA)' : 'Scarica i turni';
+    $('dl1').disabled = shifts.length === 0 || (split && shifts.length === np);
+    $('dl2').hidden = !split;
+    $('c3').hidden = false;
+  }
+
+  async function deliver(filename, text) {
+    const blob = new Blob([text], { type: 'text/calendar' });
+    if (window.claude && window.claude.use) {
+      try { const dl = await window.claude.use('downloads'); if (dl) { await dl.save({ filename, data: blob }); return true; } } catch (e) { if (e && (e.code === 'declined' || e.code === 'cancelled')) return false; }
+    }
+    try {
+      const f = new File([blob], filename, { type: 'text/calendar' });
+      if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: filename }); return true; }
+    } catch (e) { if (e && e.name === 'AbortError') return false; }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+    return true;
+  }
+
+  async function download(kind) {
+    const who = $('who').value, split = $('splitPa').checked && shifts.some(s => s.pa);
+    let sel, name, cal;
+    if (!split) { sel = shifts; name = 'turni'; cal = 'Turni ' + who; }
+    else if (kind === 'pa') { sel = shifts.filter(s => s.pa); name = 'pa'; cal = 'Turni PA'; }
+    else { sel = shifts.filter(s => !s.pa); name = 'turni'; cal = 'Turni ' + who; }
+    if (!sel.length) return;
+    const fn = name + '-' + T.norm(who).replace(/[^a-z0-9]+/g, '-') + '-' + T.MESI[parsed.month] + '-' + parsed.year + '.ics';
+    try {
+      const ok = await deliver(fn, T.buildIcs(sel, who, cal));
+      const d = $('done');
+      if (ok) { d.textContent = 'File pronto: ' + fn + ' (' + sel.length + ' impegni). Aprilo per inserirli nel calendario.'; d.hidden = false; }
+    } catch (e) {
+      showErr('Il salvataggio del file non è riuscito. Riprova o apri la pagina in un altro browser.');
+    }
+  }
+
+  $('pdf').addEventListener('change', e => onFile(e.target.files[0]));
+  $('who').addEventListener('change', render);
+  $('splitPa').addEventListener('change', render);
+  $('dl1').addEventListener('click', () => download('main'));
+  $('dl2').addEventListener('click', () => download('pa'));
+  const drop = $('drop');
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => { const f = e.dataTransfer && e.dataTransfer.files[0]; if (f) onFile(f); });
+})();
+</script>
