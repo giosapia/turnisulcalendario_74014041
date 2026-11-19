@@ -104,7 +104,7 @@ details ol,details ul{margin:6px 0 0;padding-left:22px;display:flex;flex-directi
     <h2 id="s1">PDF dei turni</h2>
     <label class="drop" id="drop" for="pdf">
       <b id="dropT">Scegli il PDF</b>
-      <span id="dropS">oppure trascinalo qui</span>
+      <span id="dropS">tocca qui, oppure trascina il file</span>
       <input type="file" id="pdf" accept="application/pdf,.pdf">
     </label>
     <div id="err" class="note bad" role="alert" hidden></div>
@@ -322,7 +322,7 @@ if (typeof module !== 'undefined') module.exports = TURNI;
       if (m) sel.value = m; else if (!last) sel.selectedIndex = 0;
       $('c2').hidden = false; render();
     } catch (e) {
-      parsed = null; $('dropT').textContent = 'Scegli il PDF'; $('dropS').textContent = 'oppure trascinalo qui';
+      parsed = null; $('dropT').textContent = 'Scegli il PDF'; $('dropS').textContent = 'tocca qui, oppure trascina il file';
       showErr(e && e.message ? e.message : 'Non riesco a leggere questo PDF.');
     }
   }
@@ -381,7 +381,7 @@ if (typeof module !== 'undefined') module.exports = TURNI;
     try {
       const ok = await deliver(fn, T.buildIcs(sel, who, cal));
       const d = $('done');
-      if (ok) { d.textContent = 'File pronto: ' + fn + ' (' + sel.length + ' impegni). Aprilo per inserirli nel calendario.'; d.hidden = false; }
+      if (ok) { d.textContent = 'File pronto: ' + fn + ' (' + sel.length + (sel.length === 1 ? ' impegno' : ' impegni') + '). Aprilo per inserirli nel calendario.'; d.hidden = false; }
     } catch (e) {
       showErr('Il salvataggio del file non è riuscito. Riprova o apri la pagina in un altro browser.');
     }
