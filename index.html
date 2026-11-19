@@ -289,7 +289,7 @@ const TURNI = (function () {
         'DTSTART;TZID=Europe/Rome:' + start,
         'DTEND;TZID=Europe/Rome:' + end,
         'SUMMARY:' + title(s),
-        'LOCATION:Pronto Soccorso Susa',
+        'LOCATION:Pronto Soccorso\\, Corso Inghilterra 66\\, 10059 Susa TO',
         'TRANSP:OPAQUE',
         'END:VEVENT');
     });
@@ -359,7 +359,7 @@ if (typeof module !== 'undefined') module.exports = TURNI;
     const a = ds(s.y, s.m, s.d) + (night ? 'T200000' : 'T080000');
     const b = ds(nx.getFullYear(), nx.getMonth(), nx.getDate()) + (night ? 'T080000' : 'T200000');
     return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(T.title(s)) +
-      '&dates=' + a + '/' + b + '&ctz=Europe%2FRome&location=' + encodeURIComponent('Pronto Soccorso Susa');
+      '&dates=' + a + '/' + b + '&ctz=Europe%2FRome&location=' + encodeURIComponent('Pronto Soccorso, Corso Inghilterra 66, 10059 Susa TO');
   }
 
   function render() {
@@ -462,7 +462,7 @@ if (typeof module !== 'undefined') module.exports = TURNI;
       id: 'psusa' + s.y + p2(s.m + 1) + p2(s.d) + (night ? 'n' : 'd'),
       status: 'confirmed',
       summary: T.title(s),
-      location: 'Pronto Soccorso Susa',
+      location: 'Pronto Soccorso, Corso Inghilterra 66, 10059 Susa TO',
       start: { dateTime: at(s.y, s.m, s.d, night ? '20' : '08'), timeZone: 'Europe/Rome' },
       end: { dateTime: at(nx.getFullYear(), nx.getMonth(), nx.getDate(), night ? '08' : '20'), timeZone: 'Europe/Rome' },
       colorId: s.pa ? '6' : (night ? '9' : '7')   /* PA arancione, notte blu scuro, giornata azzurro */
