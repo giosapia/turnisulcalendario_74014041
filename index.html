@@ -1,3 +1,14 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0e5c86">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Turni">
 <title>Turni sul calendario</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -5,7 +16,7 @@
 <style>
 /* Layout: colonna unica stretta, tre passi in sequenza (PDF, nome, calendario); un riquadro per passo */
 :root{
-  --bg:#eef1f4; --surface:#ffffff; --ink:#17212b; --muted:#5b6772; --line:#d5dce3; --soft:#f3f5f7;
+  --bg:#eef1f4; --surface:#ffffff; --ink:#17212b; --muted:#46515c; --line:#d5dce3; --soft:#f3f5f7;
   --accent:#0e5c86; --accent-ink:#ffffff;
   --day:#e3eef6; --day-ink:#0e4a6c; --night:#e4e6f7; --night-ink:#35358f; --pa:#fbe9c8; --pa-ink:#8a4b00;
   --bad:#b3261e; --badbg:#fbe9e7; --ok:#1d7a4b; --okbg:#e3f3ea;
@@ -14,71 +25,73 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0f151b; --surface:#18212a; --ink:#e6ecf1; --muted:#92a0ac; --line:#2a3641; --soft:#1e2933;
+    --bg:#0f151b; --surface:#18212a; --ink:#e6ecf1; --muted:#aab7c2; --line:#2a3641; --soft:#1e2933;
     --accent:#63b1df; --accent-ink:#0c1620;
     --day:#1b3040; --day-ink:#9fd0ee; --night:#26284d; --night-ink:#b9bcff; --pa:#4a3714; --pa-ink:#f4c883;
     --bad:#ff8f86; --badbg:#3b2220; --ok:#5fcf93; --okbg:#173326; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0f151b; --surface:#18212a; --ink:#e6ecf1; --muted:#92a0ac; --line:#2a3641; --soft:#1e2933;
+  --bg:#0f151b; --surface:#18212a; --ink:#e6ecf1; --muted:#aab7c2; --line:#2a3641; --soft:#1e2933;
   --accent:#63b1df; --accent-ink:#0c1620;
   --day:#1b3040; --day-ink:#9fd0ee; --night:#26284d; --night-ink:#b9bcff; --pa:#4a3714; --pa-ink:#f4c883;
   --bad:#ff8f86; --badbg:#3b2220; --ok:#5fcf93; --okbg:#173326; color-scheme:dark;
 }
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--f-ui);
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font:17px/1.5 var(--f-ui);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
-.wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
 h1,h2,p{margin:0}
-h1{font:600 22px/1.2 var(--f-ui);letter-spacing:-.01em;text-wrap:balance}
-.lead{color:var(--muted);font-size:14px;max-width:60ch}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
-.card h2{font:600 15px var(--f-ui)}
-.step{font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:96px;padding:14px;border:1.5px dashed var(--line);border-radius:8px;background:var(--soft);cursor:pointer;text-align:center}
+h1{font:600 28px/1.15 var(--f-ui);letter-spacing:-.01em;text-wrap:balance}
+.lead{color:var(--muted);font-size:16.5px;max-width:60ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.card h2{font:600 20px/1.25 var(--f-ui)}
+.step{font:500 12.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:128px;padding:16px;border:1.5px dashed var(--line);border-radius:8px;background:var(--soft);cursor:pointer;text-align:center}
 .drop.over{border-color:var(--accent);background:var(--day)}
-.drop b{font-weight:600}
-.drop span{color:var(--muted);font-size:13px}
+.drop b{font-weight:600;font-size:19px;overflow-wrap:anywhere}
+.drop span{color:var(--muted);font-size:16px}
 .drop input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .drop:focus-within{outline:2px solid var(--accent);outline-offset:2px}
-.note{border-radius:8px;padding:9px 11px;font-size:13px}
+.note{border-radius:8px;padding:13px 14px;font-size:16px}
 .note.bad{background:var(--badbg);color:var(--bad)}
 .note.ok{background:var(--okbg);color:var(--ok)}
-label.f{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--muted)}
-select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;min-height:44px;padding:0 10px;width:100%}
+label.f{display:flex;flex-direction:column;gap:7px;font-size:16px;color:var(--muted)}
+select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;min-height:54px;padding:0 12px;width:100%;font-size:18px}
 select:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.stat{background:var(--soft);border-radius:8px;padding:10px}
-.stat b{display:block;font:500 22px var(--f-mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-.stat span{font-size:12px;color:var(--muted)}
+.stat{background:var(--soft);border-radius:8px;padding:12px}
+.stat b{display:block;font:600 32px/1.1 var(--f-mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stat span{font-size:15px;color:var(--muted)}
 .list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.list div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.list div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:13px 12px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
 .list div:last-child{border-bottom:0}
-.list .d{font:500 14px var(--f-mono)}
-.list .d i{font-style:normal;color:var(--muted);font-family:var(--f-ui);font-size:13px;margin-left:6px}
-.chip{font:500 12px var(--f-ui);padding:3px 9px;border-radius:12px;white-space:nowrap}
+.list .d{font:500 19px var(--f-mono)}
+.list .d i{font-style:normal;color:var(--muted);font-family:var(--f-ui);font-size:16px;margin-left:8px}
+.chip{font:500 15.5px var(--f-ui);padding:5px 13px;border-radius:16px;white-space:nowrap}
 .chip.day{background:var(--day);color:var(--day-ink)}
 .chip.night{background:var(--night);color:var(--night-ink)}
 .chip.pa{background:var(--pa);color:var(--pa-ink)}
-.opt{display:flex;gap:10px;align-items:flex-start;font-size:14px}
-.opt input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--accent);flex:none}
-.opt small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.opt{display:flex;gap:12px;align-items:flex-start;font-size:17px}
+.opt input{width:28px;height:28px;margin:0;accent-color:var(--accent);flex:none}
+.opt small{display:block;color:var(--muted);font-size:15px;margin-top:3px}
 .row{display:flex;gap:8px;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font:500 15px var(--f-ui);cursor:pointer;flex:1 1 180px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:58px;padding:0 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font:600 18px var(--f-ui);cursor:pointer;flex:1 1 230px}
 .btn.alt{background:var(--surface);color:var(--accent)}
 .btn:disabled{opacity:.5;cursor:default}
-details{font-size:13.5px;color:var(--muted)}
-details summary{cursor:pointer;color:var(--ink);font-weight:500;min-height:32px;display:flex;align-items:center}
-details ol{margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:5px}
+details{font-size:16px;color:var(--muted)}
+details summary{cursor:pointer;color:var(--ink);font-weight:500;min-height:48px;display:flex;align-items:center;font-size:17px}
+details ol,details ul{margin:6px 0 0;padding-left:22px;display:flex;flex-direction:column;gap:9px}
 .legend{display:flex;gap:6px;flex-wrap:wrap}
-.foot{font-size:12px;color:var(--muted)}
-.empty-prev{color:var(--muted);font-size:13px}
+.foot{font-size:14.5px;color:var(--muted)}
+.empty-prev{color:var(--muted);font-size:16px}
 [hidden]{display:none!important}
 @media (prefers-reduced-motion:no-preference){.drop,.btn{transition:background .12s,border-color .12s}}
 </style>
-
+</head>
+<body>
 <div class="wrap">
   <header style="display:flex;flex-direction:column;gap:6px">
     <h1>Turni sul calendario</h1>
@@ -95,6 +108,14 @@ details ol{margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;g
       <input type="file" id="pdf" accept="application/pdf,.pdf">
     </label>
     <div id="err" class="note bad" role="alert" hidden></div>
+    <details>
+      <summary>Come prendere il PDF da WhatsApp</summary>
+      <ul>
+        <li><b>iPhone:</b> in WhatsApp tocca il PDF, poi il simbolo di condivisione e scegli “Salva su File”. Torna qui, tocca “Scegli il PDF” e seleziona il file salvato.</li>
+        <li><b>Android:</b> installa questa pagina come app (menu del browser, “Installa app” o “Aggiungi a schermata Home”). Poi in WhatsApp apri il PDF, tocca “Condividi” e scegli “Turni sul calendario”: si apre già letto.</li>
+        <li>Se la condivisione diretta non compare, salva il PDF sul telefono e usa “Scegli il PDF”.</li>
+      </ul>
+    </details>
   </section>
 
   <section class="card" id="c2" aria-labelledby="s2" hidden>
@@ -367,6 +388,25 @@ if (typeof module !== 'undefined') module.exports = TURNI;
   }
 
   $('pdf').addEventListener('change', e => onFile(e.target.files[0]));
+
+  /* PDF condiviso da un'altra app (WhatsApp): lo riceve il service worker e lo lascia in cache */
+  async function loadShared() {
+    if (!/[?&]condiviso=1/.test(location.search)) return;
+    try { history.replaceState(null, '', location.pathname); } catch (e) { }
+    try {
+      const c = await caches.open('turni-shared');
+      const r = await c.match('shared-pdf');
+      if (!r) { showErr('Non ho ricevuto nessun PDF. Riprova a condividerlo, oppure salvalo sul telefono e usa “Scegli il PDF”.'); return; }
+      const blob = await r.blob();
+      let nome = 'turni.pdf'; try { nome = decodeURIComponent(r.headers.get('X-Nome') || nome); } catch (e) { }
+      await c.delete('shared-pdf');
+      await onFile(new File([blob], nome, { type: 'application/pdf' }));
+    } catch (e) { showErr('Non riesco a leggere il file condiviso. Salvalo sul telefono e usa “Scegli il PDF”.'); }
+  }
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    navigator.serviceWorker.register('sw.js').catch(function () { });
+  }
+  loadShared();
   $('who').addEventListener('change', render);
   $('splitPa').addEventListener('change', render);
   $('dl1').addEventListener('click', () => download('main'));
@@ -377,3 +417,5 @@ if (typeof module !== 'undefined') module.exports = TURNI;
   drop.addEventListener('drop', e => { const f = e.dataTransfer && e.dataTransfer.files[0]; if (f) onFile(f); });
 })();
 </script>
+</body>
+</html>
