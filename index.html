@@ -87,6 +87,9 @@ details ol,details ul{margin:6px 0 0;padding-left:22px;display:flex;flex-directi
 .legend{display:flex;gap:6px;flex-wrap:wrap}
 .foot{font-size:14.5px;color:var(--muted)}
 .empty-prev{color:var(--muted);font-size:16px}
+.paste{width:100%;min-height:54px;font:inherit;font-size:17px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:0 14px}
+.paste::placeholder{color:var(--muted)}
+.paste:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 [hidden]{display:none!important}
 @media (prefers-reduced-motion:no-preference){.drop,.btn{transition:background .12s,border-color .12s}}
 </style>
@@ -107,6 +110,7 @@ details ol,details ul{margin:6px 0 0;padding-left:22px;display:flex;flex-directi
       <span id="dropS">tocca qui, oppure trascina il file</span>
       <input type="file" id="pdf" accept="application/pdf,.pdf">
     </label>
+    <input class="paste" id="incolla" type="text" inputmode="none" autocomplete="off" placeholder="Oppure tocca qui e incolla il PDF copiato" aria-label="Incolla il PDF copiato">
     <div id="err" class="note bad" role="alert" hidden></div>
     <details>
       <summary>Come prendere il PDF da WhatsApp</summary>
@@ -406,6 +410,14 @@ if (typeof module !== 'undefined') module.exports = TURNI;
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js').catch(function () { });
   }
+  /* PDF copiato e incollato (anche con Ctrl+V da computer) */
+  document.addEventListener('paste', function (e) {
+    const dt = e.clipboardData, files = dt && dt.files ? Array.from(dt.files) : [];
+    const f = files.find(x => /pdf/i.test(x.type) || /\.pdf$/i.test(x.name));
+    const inField = e.target && e.target.id === 'incolla';
+    if (f) { e.preventDefault(); const c = $('incolla'); if (c) c.value = ''; onFile(f); }
+    else if (inField) { e.preventDefault(); showErr('Negli appunti non c\u2019\u00e8 un PDF. Salva il PDF sul telefono e usa \u201cScegli il PDF\u201d.'); }
+  });
   loadShared();
   $('who').addEventListener('change', render);
   $('splitPa').addEventListener('change', render);
