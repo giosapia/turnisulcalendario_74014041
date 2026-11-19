@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy – Turni sul calendario</title>
+<style>
+:root{--bg:#eef1f4;--surface:#ffffff;--ink:#17212b;--muted:#46515c;--line:#d5dce3;--accent:#0e5c86}
+@media (prefers-color-scheme: dark){:root{--bg:#0f151b;--surface:#18212a;--ink:#e6ecf1;--muted:#aab7c2;--line:#2a3641;--accent:#63b1df;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;padding:24px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+main{max-width:680px;margin:0 auto;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px}
+h1{font-size:26px;line-height:1.2;margin:0 0 6px}
+h2{font-size:19px;margin:24px 0 6px}
+p,li{margin:0 0 10px}
+ul{padding-left:22px;margin:0 0 10px}
+.muted{color:var(--muted);font-size:15px}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Informativa sulla privacy</h1>
+  <p class="muted">Turni sul calendario · aggiornata il 19 novembre 2026</p>
+
+  <h2>Cos'è</h2>
+  <p>“Turni sul calendario” è una pagina web che legge il PDF dei turni mensili del Pronto Soccorso di Susa e inserisce nel calendario dell'utente i turni della persona scelta (giornata 8-20, notte 20-8, prestazioni aggiuntive).</p>
+
+  <h2>Quali dati usa</h2>
+  <ul>
+    <li><b>Il PDF dei turni.</b> Viene letto direttamente nel tuo dispositivo. Non viene caricato né inviato a nessun server.</li>
+    <li><b>Il nome che scegli.</b> Viene ricordato nella memoria del tuo browser, solo per proporlo la volta dopo. Puoi cancellarlo dai dati del sito.</li>
+  </ul>
+
+  <h2>Accesso a Google Calendar</h2>
+  <p>Solo se tocchi “Inserisci tutto in Google Calendar”, la pagina ti chiede il permesso di visualizzare e modificare gli eventi dei tuoi calendari (ambito <code>calendar.events</code>). Lo usa unicamente per creare o aggiornare gli eventi dei tuoi turni (titolo, orario, luogo “Pronto Soccorso Susa”) nel tuo calendario principale.</p>
+  <ul>
+    <li>Non legge, non copia e non condivide altri tuoi eventi o dati.</li>
+    <li>Il permesso resta nel tuo browser per il tempo della sessione. Non viene salvato su un server né inviato a nessuno.</li>
+    <li>Non esiste un server di questa pagina e non ci sono statistiche, tracciamento o pubblicità.</li>
+    <li>L'uso delle informazioni ricevute dalle API di Google rispetta la <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, compresi i requisiti sull'uso limitato.</li>
+  </ul>
+  <p>Puoi revocare il permesso in qualsiasi momento da <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>. Gli eventi già inseriti restano nel calendario finché non li elimini.</p>
+
+  <h2>Servizi usati dalla pagina</h2>
+  <p>La pagina è ospitata su GitHub Pages, che può registrare i normali accessi tecnici. Carica da servizi esterni la libreria di lettura dei PDF (cdnjs), i caratteri (Google Fonts) e, se usi l'accesso, il servizio di accesso di Google.</p>
+
+  <h2>Contatti</h2>
+  <p>Per domande o richieste rivolgiti al gestore della pagina tramite il profilo GitHub <a href="https://github.com/giosapia">giosapia</a>.</p>
+</main>
+</body>
+</html>
