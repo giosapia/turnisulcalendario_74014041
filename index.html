@@ -90,6 +90,14 @@ details ol,details ul{margin:6px 0 0;padding-left:22px;display:flex;flex-directi
 .paste{width:100%;min-height:54px;font:inherit;font-size:17px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:0 14px}
 .paste::placeholder{color:var(--muted)}
 .paste:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.when{display:flex;flex-direction:column;align-items:flex-start;gap:7px;min-width:0}
+.gbtn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 16px;border-radius:8px;border:1.5px solid var(--accent);background:var(--surface);color:var(--accent);font:600 16px var(--f-ui);text-decoration:none;white-space:nowrap}
+.gbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.gbtn.done{border-color:var(--line);color:var(--muted);font-weight:500}
+.hint{font-size:16px;color:var(--muted)}
+.stack{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+.stack>.btn{flex:none}
+.note.info{background:var(--soft);color:var(--ink)}
 [hidden]{display:none!important}
 @media (prefers-reduced-motion:no-preference){.drop,.btn{transition:background .12s,border-color .12s}}
 </style>
@@ -98,7 +106,7 @@ details ol,details ul{margin:6px 0 0;padding-left:22px;display:flex;flex-directi
 <div class="wrap">
   <header style="display:flex;flex-direction:column;gap:6px">
     <h1>Turni sul calendario</h1>
-    <p class="lead">Carica il PDF dei turni del mese, scegli il tuo nome e scarica un file da aprire con il calendario del telefono o di Google. Ogni turno compare come impegno:</p>
+    <p class="lead">Carica il PDF dei turni del mese, scegli il tuo nome e porta i tuoi turni nel calendario Google. Ogni turno compare come impegno:</p>
     <div class="legend" aria-label="Tipi di impegno"><span class="chip day">Giornata 8-20</span><span class="chip night">Notte 20-8</span><span class="chip pa">Giornata PA</span></div>
   </header>
 
@@ -110,7 +118,7 @@ details ol,details ul{margin:6px 0 0;padding-left:22px;display:flex;flex-directi
       <span id="dropS">tocca qui, oppure trascina il file</span>
       <input type="file" id="pdf" accept="application/pdf,.pdf">
     </label>
-    <input class="paste" id="incolla" type="text" inputmode="none" autocomplete="off" placeholder="Oppure tocca qui e incolla il PDF copiato" aria-label="Incolla il PDF copiato">
+    <input class="paste" id="incolla" type="text" inputmode="none" autocomplete="off" placeholder="Oppure incolla qui il PDF" aria-label="Incolla il PDF copiato">
     <div id="err" class="note bad" role="alert" hidden></div>
     <details>
       <summary>Come prendere il PDF da WhatsApp</summary>
@@ -138,25 +146,33 @@ details ol,details ul{margin:6px 0 0;padding-left:22px;display:flex;flex-directi
       <div class="stat"><b id="nNight">0</b><span>notti</span></div>
       <div class="stat"><b id="nPa">0</b><span>PA</span></div>
     </div>
+    <div id="gblock" class="stack" style="margin-top:0" hidden>
+      <button class="btn" id="gAll" type="button">Inserisci tutto in Google Calendar</button>
+      <div id="gMsg" class="note info" role="status" hidden></div>
+    </div>
+    <p class="hint" id="hintAdd">Tocca “Aggiungi” accanto a un turno: si apre Google Calendar con il turno già compilato e ti basta salvarlo.</p>
     <div class="list" id="list" role="list"></div>
     <p class="empty-prev" id="none" hidden>Questo nome non ha turni nel mese. Controlla di aver scelto quello giusto.</p>
-    <label class="opt" id="optPa">
-      <input type="checkbox" id="splitPa" checked>
-      <span>Metti le PA in un file a parte
-        <small>Importandolo in un calendario separato (per esempio “Turni PA”) lo colori come vuoi e le PA si distinguono a colpo d'occhio.</small></span>
-    </label>
-    <div class="row">
-      <button class="btn" id="dl1" type="button">Scarica i turni</button>
-      <button class="btn alt" id="dl2" type="button" hidden>Scarica le PA</button>
-    </div>
-    <div id="done" class="note ok" role="status" hidden></div>
     <details>
-      <summary>Come aprire il file</summary>
-      <ol>
-        <li><b>Telefono:</b> apri il file scaricato (o condiviso) e scegli il calendario in cui inserire i turni.</li>
-        <li><b>Google Calendar da computer:</b> calendar.google.com, ingranaggio, Impostazioni, Importa ed esporta, Importa; scegli il file e il calendario di destinazione.</li>
-        <li>Se riscarichi lo stesso mese dopo una modifica, i turni già presenti vengono aggiornati e non duplicati.</li>
-      </ol>
+      <summary>Scarica il file per il computer (.ics)</summary>
+      <div class="stack">
+        <label class="opt" id="optPa">
+          <input type="checkbox" id="splitPa" checked>
+          <span>Metti le PA in un file a parte
+            <small>Importandolo in un calendario separato (per esempio “Turni PA”) lo colori come vuoi e le PA si distinguono a colpo d'occhio.</small></span>
+        </label>
+        <div class="row">
+          <button class="btn" id="dl1" type="button">Scarica i turni</button>
+          <button class="btn alt" id="dl2" type="button" hidden>Scarica le PA</button>
+        </div>
+        <div id="done" class="note ok" role="status" hidden></div>
+        <ol>
+          <li><b>Da computer:</b> calendar.google.com, ingranaggio, Impostazioni, Importa ed esporta, Importa; scegli il file e il calendario di destinazione.</li>
+          <li><b>iPhone:</b> apri il file dall'app File e tocca “Aggiungi tutti”: finiscono nel Calendario di Apple.</li>
+          <li>L'app Google Calendar del telefono non importa i file .ics.</li>
+          <li>Se riscarichi lo stesso mese dopo una modifica, i turni già presenti vengono aggiornati e non duplicati.</li>
+        </ol>
+      </div>
     </details>
   </section>
 
@@ -291,6 +307,10 @@ if (typeof module !== 'undefined') module.exports = TURNI;
   'use strict';
   const $ = id => document.getElementById(id);
   const T = TURNI;
+  /* Codice cliente Google per il pulsante "Inserisci tutto in Google Calendar".
+     Vuoto = il pulsante non compare e restano i tasti "Aggiungi" turno per turno. */
+  const GOOGLE_CLIENT_ID = '';
+  const p2 = n => String(n).padStart(2, '0');
   let parsed = null, shifts = [];
 
   function showErr(t) { const e = $('err'); e.textContent = t || ''; e.hidden = !t; }
@@ -333,25 +353,42 @@ if (typeof module !== 'undefined') module.exports = TURNI;
 
   function chipFor(s) { return s.type === 'night' ? ['night', 'Notte 20-8'] : (s.pa ? ['pa', 'Giornata PA'] : ['day', 'Giornata 8-20']); }
 
+  function gcalUrl(s) {
+    const ds = (y, m, d) => y + p2(m + 1) + p2(d), night = s.type === 'night';
+    const nx = new Date(s.y, s.m, s.d + (night ? 1 : 0));
+    const a = ds(s.y, s.m, s.d) + (night ? 'T200000' : 'T080000');
+    const b = ds(nx.getFullYear(), nx.getMonth(), nx.getDate()) + (night ? 'T080000' : 'T200000');
+    return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(T.title(s)) +
+      '&dates=' + a + '/' + b + '&ctz=Europe%2FRome&location=' + encodeURIComponent('Pronto Soccorso Susa');
+  }
+
   function render() {
     if (!parsed) return;
     const who = $('who').value; lsSet('turni-nome', who);
     shifts = T.shiftsOf(parsed, who);
-    $('done').hidden = true;
+    $('done').hidden = true; $('gMsg').hidden = true;
     const nd = shifts.filter(s => s.type === 'day' && !s.pa).length, nn = shifts.filter(s => s.type === 'night').length, np = shifts.filter(s => s.pa).length;
     $('nDay').textContent = nd; $('nNight').textContent = nn; $('nPa').textContent = np;
     const list = $('list'); list.textContent = '';
     shifts.forEach(s => {
       const [cls, lbl] = chipFor(s);
       const row = document.createElement('div'); row.setAttribute('role', 'listitem');
+      const left = document.createElement('span'); left.className = 'when';
       const d = document.createElement('span'); d.className = 'd';
       const wd = T.GIORNI_BREVI[new Date(s.y, s.m, s.d).getDay()];
       d.textContent = s.d + ' ' + T.MESI[s.m].slice(0, 3);
       const i = document.createElement('i'); i.textContent = wd; d.appendChild(i);
       const c = document.createElement('span'); c.className = 'chip ' + cls; c.textContent = lbl;
-      row.appendChild(d); row.appendChild(c); list.appendChild(row);
+      left.appendChild(d); left.appendChild(c);
+      const a = document.createElement('a'); a.className = 'gbtn'; a.textContent = 'Aggiungi';
+      a.href = gcalUrl(s); a.target = '_blank'; a.rel = 'noopener';
+      a.setAttribute('aria-label', 'Aggiungi a Google Calendar: ' + lbl + ', ' + d.textContent);
+      a.addEventListener('click', () => { a.classList.add('done'); a.textContent = 'Aperto'; });
+      row.appendChild(left); row.appendChild(a); list.appendChild(row);
     });
     $('none').hidden = shifts.length > 0; list.hidden = shifts.length === 0;
+    $('hintAdd').hidden = shifts.length === 0;
+    $('gblock').hidden = !GOOGLE_CLIENT_ID || shifts.length === 0;
     $('optPa').hidden = np === 0;
     const split = np > 0 && $('splitPa').checked;
     $('dl1').textContent = split ? 'Scarica i turni (senza PA)' : 'Scarica i turni';
@@ -410,6 +447,69 @@ if (typeof module !== 'undefined') module.exports = TURNI;
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js').catch(function () { });
   }
+  /* ---- Inserimento diretto in Google Calendar (accesso con Google) ---- */
+  function gSay(kind, text) { const m = $('gMsg'); m.className = 'note ' + kind; m.textContent = text; m.hidden = false; }
+  function gReady() { return !!(window.google && google.accounts && google.accounts.oauth2); }
+  function loadGsi() {
+    if (!GOOGLE_CLIENT_ID || document.getElementById('gsi')) return;
+    const s = document.createElement('script'); s.id = 'gsi'; s.src = 'https://accounts.google.com/gsi/client'; s.async = true;
+    document.head.appendChild(s);
+  }
+  function eventBody(s) {
+    const night = s.type === 'night', nx = new Date(s.y, s.m, s.d + (night ? 1 : 0));
+    const at = (y, m, d, hh) => y + '-' + p2(m + 1) + '-' + p2(d) + 'T' + hh + ':00:00';
+    return {
+      id: 'psusa' + s.y + p2(s.m + 1) + p2(s.d) + (night ? 'n' : 'd'),
+      status: 'confirmed',
+      summary: T.title(s),
+      location: 'Pronto Soccorso Susa',
+      start: { dateTime: at(s.y, s.m, s.d, night ? '20' : '08'), timeZone: 'Europe/Rome' },
+      end: { dateTime: at(nx.getFullYear(), nx.getMonth(), nx.getDate(), night ? '08' : '20'), timeZone: 'Europe/Rome' },
+      colorId: s.pa ? '6' : (night ? '9' : '7')   /* PA arancione, notte blu scuro, giornata azzurro */
+    };
+  }
+  async function gInsertAll(token) {
+    const base = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
+    const hdr = { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+    let added = 0, updated = 0, failed = 0, denied = false;
+    for (let k = 0; k < shifts.length; k++) {
+      const body = eventBody(shifts[k]);
+      gSay('info', 'Inserimento in corso: ' + (k + 1) + ' di ' + shifts.length + '…');
+      try {
+        let r = await fetch(base, { method: 'POST', headers: hdr, body: JSON.stringify(body) });
+        if (r.status === 409) {   /* già presente (anche cancellato): lo aggiorno */
+          r = await fetch(base + '/' + body.id, { method: 'PUT', headers: hdr, body: JSON.stringify(body) });
+          if (r.ok) updated++; else failed++;
+        } else if (r.ok) added++;
+        else { failed++; if (r.status === 401 || r.status === 403) { denied = true; break; } }
+      } catch (e) { failed++; }
+    }
+    if (denied) { gSay('bad', 'Google non ha permesso di scrivere nel calendario. Controlla di aver accettato l’accesso al calendario e riprova.'); return; }
+    const parts = [];
+    if (added) parts.push(added + (added === 1 ? ' turno inserito' : ' turni inseriti'));
+    if (updated) parts.push(updated + (updated === 1 ? ' aggiornato' : ' aggiornati'));
+    if (failed) parts.push(failed + ' non riusciti: riprova');
+    gSay(failed ? 'bad' : 'ok', (failed ? '' : 'Fatto: ') + parts.join(', ') + (failed ? '.' : ' nel tuo calendario principale.'));
+  }
+  let gClient = null;
+  function gStart() {
+    if (!shifts.length) return;
+    if (!gReady()) { gSay('bad', 'Il collegamento con Google non è ancora pronto. Controlla la connessione e riprova tra qualche secondo.'); return; }
+    gSay('info', 'Si apre la finestra di Google per l’accesso…');
+    gClient = gClient || google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/calendar.events',
+      callback: resp => {
+        if (resp && resp.access_token) gInsertAll(resp.access_token);
+        else gSay('bad', 'Accesso non riuscito o annullato. Se compare “app non verificata”, tocca Avanzate e poi Vai a Turni sul calendario.');
+      },
+      error_callback: () => gSay('bad', 'Accesso annullato. Riprova e consenti l’accesso al calendario.')
+    });
+    gClient.requestAccessToken();
+  }
+  $('gAll').addEventListener('click', gStart);
+  loadGsi();
+
   /* PDF copiato e incollato (anche con Ctrl+V da computer) */
   document.addEventListener('paste', function (e) {
     const dt = e.clipboardData, files = dt && dt.files ? Array.from(dt.files) : [];
