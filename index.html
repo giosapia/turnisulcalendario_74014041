@@ -18,7 +18,7 @@
 :root{
   --bg:#eef1f4; --surface:#ffffff; --ink:#17212b; --muted:#46515c; --line:#d5dce3; --soft:#f3f5f7;
   --accent:#0e5c86; --accent-ink:#ffffff;
-  --day:#e3eef6; --day-ink:#0e4a6c; --night:#e4e6f7; --night-ink:#35358f; --pa:#ece4f7; --pa-ink:#5b3a8a; --ros:#fbe1e1; --ros-ink:#9b1c1c;
+  --day:#e3eef6; --day-ink:#0e4a6c; --night:#e4e6f7; --night-ink:#35358f; --pa:#fbe9c8; --pa-ink:#8a4b00;
   --bad:#b3261e; --badbg:#fbe9e7; --ok:#1d7a4b; --okbg:#e3f3ea;
   --f-ui:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
   --f-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
@@ -27,14 +27,14 @@
   :root:not([data-theme="light"]){
     --bg:#0f151b; --surface:#18212a; --ink:#e6ecf1; --muted:#aab7c2; --line:#2a3641; --soft:#1e2933;
     --accent:#63b1df; --accent-ink:#0c1620;
-    --day:#1b3040; --day-ink:#9fd0ee; --night:#26284d; --night-ink:#b9bcff; --pa:#3a2c52; --pa-ink:#d8c4f5; --ros:#4a1f1f; --ros-ink:#ffb4b4;
+    --day:#1b3040; --day-ink:#9fd0ee; --night:#26284d; --night-ink:#b9bcff; --pa:#4a3714; --pa-ink:#f4c883;
     --bad:#ff8f86; --badbg:#3b2220; --ok:#5fcf93; --okbg:#173326; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#0f151b; --surface:#18212a; --ink:#e6ecf1; --muted:#aab7c2; --line:#2a3641; --soft:#1e2933;
   --accent:#63b1df; --accent-ink:#0c1620;
-  --day:#1b3040; --day-ink:#9fd0ee; --night:#26284d; --night-ink:#b9bcff; --pa:#3a2c52; --pa-ink:#d8c4f5; --ros:#4a1f1f; --ros-ink:#ffb4b4;
+  --day:#1b3040; --day-ink:#9fd0ee; --night:#26284d; --night-ink:#b9bcff; --pa:#4a3714; --pa-ink:#f4c883;
   --bad:#ff8f86; --badbg:#3b2220; --ok:#5fcf93; --okbg:#173326; color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -71,8 +71,8 @@ select:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-
 .list .d{font:500 19px var(--f-mono)}
 .list .d i{font-style:normal;color:var(--muted);font-family:var(--f-ui);font-size:16px;margin-left:8px}
 .chip{font:500 15.5px var(--f-ui);padding:5px 13px;border-radius:16px;white-space:nowrap}
-.chip.day{background:var(--ros);color:var(--ros-ink)}
-.chip.night{background:var(--ros);color:var(--ros-ink)}
+.chip.day{background:var(--day);color:var(--day-ink)}
+.chip.night{background:var(--night);color:var(--night-ink)}
 .chip.pa{background:var(--pa);color:var(--pa-ink)}
 .opt{display:flex;gap:12px;align-items:flex-start;font-size:17px}
 .opt input{width:28px;height:28px;margin:0;accent-color:var(--accent);flex:none}
@@ -467,7 +467,7 @@ if (typeof module !== 'undefined') module.exports = TURNI;
       location: 'Ospedale di Susa Pronto Soccorso',
       start: { dateTime: at(s.y, s.m, s.d, night ? '20' : '08'), timeZone: 'Europe/Rome' },
       end: { dateTime: at(nx.getFullYear(), nx.getMonth(), nx.getDate(), night ? '08' : '20'), timeZone: 'Europe/Rome' },
-      colorId: s.pa ? '1' : '11'   /* PA glicine (Lavanda), giornate e notti rosso (Pomodoro) */
+      colorId: s.pa ? '6' : (night ? '9' : '7')   /* PA arancione, notte blu scuro, giornata azzurro */
     };
   }
   async function gInsertAll(token) {
