@@ -203,7 +203,7 @@ const TURNI = (function () {
     const lre = /^(lun|mar|mer|gio|ven|sab|dom)\s+(\d{1,2})\s*\/\s*(\d{1,2})$/i;
     const labels = [];
     it.forEach(i => { const m = lre.exec(i.s); if (m) { i.kind = 'label'; labels.push({ y: i.y, day: +m[2], month: +m[3] - 1 }); } });
-    if (!labels.length) throw new Error('Non trovo le righe dei giorni (come "lun 2/11"). Questo non sembra il PDF dei turni del Pronto Soccorso.');
+    if (!labels.length) return null;   // pagina senza righe dei giorni (per esempio una pagina bianca in fondo)
 
     const hdr = {};
     it.forEach(i => {
@@ -246,9 +246,11 @@ const TURNI = (function () {
     const out = { month: null, year: null, entries: [], days: 0 };
     pages.forEach(p => {
       const r = parsePage(p);
+      if (!r) return;
       if (out.month === null) { out.month = r.month; out.year = r.year; }
       out.entries = out.entries.concat(r.entries); out.days += r.days;
     });
+    if (!out.days) throw new Error('Non trovo le righe dei giorni (come "lun 2/11"). Questo non sembra il PDF dei turni del Pronto Soccorso.');
     if (out.year === null) out.year = new Date().getFullYear();
     const byKey = new Map();
     out.entries.forEach(e => { const k = norm(e.name); if (!byKey.has(k)) byKey.set(k, e.name); });
